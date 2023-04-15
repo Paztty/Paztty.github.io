@@ -1,0 +1,13 @@
+body {
+    background-color: #aa1818;
+  }
+  
+  h1 {
+    color: black;
+    text-align: right;
+  }
+  
+  p {
+    font-family: verdana;
+    font-size: 20px;
+  }
