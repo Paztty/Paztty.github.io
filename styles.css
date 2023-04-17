@@ -7,11 +7,10 @@
 body {
     background-color: lightblue;
     display: flex;
-    width: 1000px;
     min-height: 100vh;
     justify-content: center;
     align-items: center;
-    margin: 5%;
+    margin: 1%;
 }
 
 .container {
@@ -31,11 +30,6 @@ body {
     background: #003147;
 }
 
-.container .rightside {
-    position: relative;
-    background: lightcyan;
-}
-
 .center {
     margin: auto;
     width: 200px;
@@ -46,7 +40,6 @@ body {
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    vertical-align: middle;
     object-fit: cover;
     margin-top: 50px;
 }
@@ -63,17 +56,21 @@ body {
 .contactInfor
 {
     margin: auto;
-    width: 90%;
+    width: 100%;
     font-size: 20px;
     text-align: center;
     color: #ccc;
-    padding-top: 25px;
-    padding-bottom:0px;
+    padding-top: 15px;
+    padding-bottom:15px;
 }
 .contactInfor a {
     width: 40px;
     height: 20px;
     padding-right: 10px;
+}
+.contactInfor p {
+    text-align: left;
+    font-size: 15px;
 }
 .contactBlock
 {
@@ -106,4 +103,115 @@ body {
 .generalBlock div
 {
     margin-left: 10px;
+}
+
+.name
+{
+    margin-top: 10px;
+    text-align: left;
+    width: 100%;
+}
+.skillBack
+{
+    text-align: right;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    height: 10px;
+    background-color: #1c5f81;
+}
+.English
+{
+    width: 54%;
+    background-color: rgb(35, 202, 160);
+    height: 10px;
+}
+.C-Sharp
+{
+    width: 84%;
+    background-color: rgb(35, 202, 160);
+    height: 10px;
+}
+.C
+{
+    width: 65%;
+    background-color: rgb(35, 202, 160);
+    height: 10px;
+}
+.Office
+{
+    width: 90%;
+    background-color: rgb(35, 202, 160);
+    height: 10px;
+}
+.MachenicalAndElectronics
+{
+    width: 75%;
+    background-color: rgb(35, 202, 160);
+    height: 10px;
+}
+
+
+
+.container .rightside {
+    position: relative;
+    background: lightcyan;
+}
+.rightside h2
+{
+    margin: auto;
+    width: 90%;
+    padding-top: 10px;
+    text-align: right;
+}
+
+.workBlock {
+    width: 90%;
+    margin: 10px;
+}
+.workBlock .header
+{
+    font-weight: 500;
+    font-size: 20px;
+    display: flex;
+}
+.header img
+{
+    display: block;
+     border-radius: 50%;
+      object-fit: cover;
+      width: 50px;
+}
+.workBlock .time
+{
+    width: 100%;
+    font-weight: 100;
+    font-size: 20px;
+    text-align: right;
+    height: 30px;
+    border-bottom:1px solid #1c5f81;
+}
+.workBlock .content
+{
+    font-weight: 400;
+    font-size: 18px;
+    margin: 20px;
+}
+.content li{
+    margin-left: 20px;
+}
+.content h5{
+    margin-left: 10px;
+}
+.field
+{
+    display: grid;
+    margin: 10px;
+    width: 90%;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.field img
+{
+    height: 100px;
+    margin: 10px;
+    box-shadow: 0px 35px 55px #003147;
 }
