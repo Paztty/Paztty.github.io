@@ -10,7 +10,7 @@
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    fetch(scriptURL, { method: 'POST', body: new FormData(form), mode: 'no-cors'})
       .then(response => alert('Thành công!'))
       .catch(error => console.error('Error!', error.message));
   });
