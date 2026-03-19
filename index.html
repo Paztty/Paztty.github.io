@@ -1,28 +1,162 @@
-<form id="contactForm">
-  <input type="text" name="name" placeholder="Tên" required>
-  <input type="email" name="email" placeholder="Email" required>
-  <button type="submit">Gửi</button>
-</form>
+<!DOCTYPE html>
+<html lang="vi">
 
-<script>
-  const proxyURL = "https://rough-leaf-4510.hovantan1107.workers.dev/";
-  const form = document.getElementById('contactForm');
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-  
-    // Gửi dữ liệu dưới dạng JSON
-    const data = {
-      name: form.name.value,
-      email: form.email.value
-    };
-  
-    fetch(proxyURL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(data)
-    })
-    .then(response => response.text())
-    .then(result => alert("Thành công: " + result))
-    .catch(error => console.error("Error!", error));
-  });
-</script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tennis match | Liên hệ</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-title-group">
+        <span class="app-badge">Tennis match</span>
+        <h1 class="screen-title">경기 등록 / Đăng kí trận</h1>
+      </div>
+      <p class="screen-subtitle">경기 등록 정보 / Thông tin đăng kí trận</p>
+    </header>
+    <main>
+      <section class="card contact-card" style="width: 100%;">
+        <form id="contactForm" class="form" style="width: 100%;">
+          <div class="field" style="width: 100%;">
+            <label for="name" style="width: 100px;">
+              당신의 이름<br/>
+              Tên của bạn
+            </label>
+            <input style="width: max-content;"
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Nhập tên của bạn"
+              required
+            />
+          </div>
+
+          <div class="field" style="width: 100%;">
+            <label for="email" style="width: 100px;">이메일<br/>Email</label>
+            <input style="width: max-content;"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="email@vidu.com"
+              required
+            />
+          </div>
+          <button type="submit" class="primary-button">
+            경기 등록 / Đăng kí trận
+          </button>
+          <p class="form-hint">Thông tin của bạn được giữ bảo mật tuyệt đối.</p>
+        </form>
+      </section>
+        <section class="card list-card" style="width: 100%; margin-top: 16px;">
+          <h2 class="list-title">등록 명단 / Danh sách đã đăng kí</h2>
+          <div id="registrationList" class="registration-list"></div>
+        </section>
+    </main>
+  </div>
+
+  <script>
+    const proxyURL = "https://rough-leaf-4510.hovantan1107.workers.dev/";
+    const form = document.getElementById('contactForm');
+
+    function renderRegistrations(list) {
+      const container = document.getElementById('registrationList');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (!list || !list.length) {
+        const p = document.createElement('p');
+        p.className = 'empty-text';
+        p.textContent = 'Chưa có đăng kí nào.';
+        container.appendChild(p);
+        return;
+      }
+
+      list.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'registration-item';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'registration-name';
+        nameEl.textContent = item.name || 'Ẩn danh';
+
+        const emailEl = document.createElement('div');
+        emailEl.className = 'registration-email';
+        emailEl.textContent = item.email || '';
+
+        const timeEl = document.createElement('div');
+        timeEl.className = 'registration-time';
+        if (item.createdAt) {
+          const dt = new Date(item.createdAt);
+          if (!Number.isNaN(dt.valueOf())) {
+            timeEl.textContent = dt.toLocaleString('vi-VN');
+          }
+        }
+
+        row.appendChild(nameEl);
+        row.appendChild(emailEl);
+        row.appendChild(timeEl);
+        container.appendChild(row);
+      });
+    }
+
+    async function loadRegistrations() {
+      try {
+        const response = await fetch(proxyURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'list' }),
+        });
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Danh sách đăng kí đã tải:', data);
+        const list = Array.isArray(data.items) ? data.items : data;
+        renderRegistrations(list);
+      } catch (error) {
+        console.error('Không tải được danh sách đăng kí:', error);
+        renderRegistrations([]);
+      }
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Đang gửi...';
+
+      const payload = {
+        name: form.name.value,
+        email: form.email.value,
+      };
+
+      fetch(proxyURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.text())
+        .then((result) => {
+          alert(' 성공 / Thành công ' + result);
+          form.reset();
+          return loadRegistrations();
+        })
+        .catch((error) => {
+          console.error('Error!', error);
+          alert('실패 / Đã xảy ra lỗi, vui lòng thử lại.');
+        })
+        .finally(() => {
+          submitButton.disabled = false;
+          submitButton.textContent = '경기 등록 / Đăng kí trận';
+        });
+    });
+
+    // Tải danh sách đăng kí từ Google Sheet khi mở trang
+    loadRegistrations();
+  </script>
+</body>
+ </html>
