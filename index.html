@@ -11,7 +11,7 @@ const proxyURL = "https://rough-leaf-4510.hovantan1107.workers.dev/";
 form.addEventListener('submit', e => {
   e.preventDefault();
   fetch(proxyURL, { method: 'POST', body: new FormData(form) })
-    .then(response => console.log(response.text())
+    .then(response => console.log(response.text()))
     .then(data => alert('Thành công!'))
     .catch(error => console.error('Error!', error));
 });
