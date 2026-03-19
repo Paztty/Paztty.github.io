@@ -5,14 +5,14 @@
 </form>
 
 <script>
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbwbrk6Eq5_CAs7v9wT6ZXEJlsyk_XDdzttv1RtU7w4NLXx-efagangGvQ6YTvP_R-xp/exec'; // Dán URL của bạn
-  const form = document.getElementById('contactForm');
+const form = document.getElementById('contactForm');
+const proxyURL = "https://rough-leaf-4510.hovantan1107.workers.dev/";
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    fetch(scriptURL, { method: 'POST', body: new FormData(form),
-        headers: {"Content-Type": "application/json"}})
-      .then(response => alert('Thành công!'))
-      .catch(error => console.error('Error!', error.message));
-  });
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  fetch(proxyURL, { method: 'POST', body: new FormData(form) })
+    .then(response => response.text())
+    .then(data => alert('Thành công!'))
+    .catch(error => console.error('Error!', error));
+});
 </script>
