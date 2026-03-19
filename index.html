@@ -11,7 +11,7 @@
   form.addEventListener('submit', e => {
     e.preventDefault();
     fetch(scriptURL, { method: 'POST', body: new FormData(form),
-        headers: {"Content-Type": "application/json"})
+        headers: {"Content-Type": "application/json"}})
       .then(response => alert('Thành công!'))
       .catch(error => console.error('Error!', error.message));
   });
