@@ -11,33 +11,116 @@ function getRegistrations_() {
   }
 
   // Bỏ qua dòng tiêu đề, chỉ lấy từ hàng 2 trở đi, cột A:C
-  var values = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
+  var values = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
   var items = [];
 
   for (var i = 0; i < values.length; i++) {
     var row = values[i];
 
-    // Bỏ qua các dòng trống tên + email
-    if (!row[0] && !row[1]) {
+    // Bỏ qua các dòng trống tên
+    if (!row[0]) {
       continue;
     }
 
     var createdAt = '';
-    if (row[2] instanceof Date) {
-      createdAt = row[2].toISOString();
-    } else if (row[2]) {
-      createdAt = String(row[2]);
+    if (row[1] instanceof Date) {
+      createdAt = row[1].toISOString();
+    } else if (row[1]) {
+      createdAt = String(row[1]);
     }
 
     items.push({
       name: row[0] || '',
-      email: row[1] || '',
       createdAt: createdAt,
+      mat: row[2],
+      san: row[3]
     });
   }
 
   return items;
 }
+
+function updateResign(name, date, mat)
+{
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
+  var sheet1 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
+  if (!sheet) {
+    return '표 읽기 오류';
+  }
+  var lastRow = sheet.getLastRow();
+  var lastRow1 = sheet1.getLastRow();
+  var valuesLookup = sheet1.getRange(2, 1, lastRow1 - 1, 3).getValues();
+
+  if(lastRow > 1)
+  {
+    var values = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
+    for (var i = 0; i < values.length; i++) {
+      var row = values[i];
+      if (row[0] === name) {
+        return '등록 완료';
+      }
+    }
+  }
+  // Tìm level 
+  var level = "";
+  for (var i = 0; i < valuesLookup.length; i++) {
+    var row = valuesLookup[i];
+    if (row[1] === name) {
+      level = row[2]
+    }
+  }
+
+  var san = 1;
+  if(level.trim() === 'A') san = 1;
+  if(level.trim() === 'B') san = 4;
+  if(level === '') 
+      return '당신은 선수 명단에 없습니다';
+  while(true)
+  {
+    if(san === 0 || san === 5) return;
+    if(lastRow <= 1)
+        break;
+    var sanCheck = values.filter(function(row) {
+          return row[2] === san;
+        }).length;
+
+    if(sanCheck <= 1)
+    {
+      break;
+    }
+    else
+    {
+      if(level.trim() === 'A') san++;
+      if(level.trim() === 'B') san--;
+      continue;
+    }
+  }
+  // Ghi dữ liệu vào bảng: Tên, Thời gian, sân đấu
+  sheet.appendRow([name, date,mat, san]);
+}
+
+function deleteData(name)
+{
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
+  if (!sheet) {
+    return [];
+  }
+  var lastRow = sheet.getLastRow();
+  if(lastRow > 1)
+  {
+    var values = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
+    for (var i = 0; i < values.length; i++) {
+      var row = values[i];
+      if (row[0] === name) {
+        // i là chỉ số trong mảng values, nhưng dòng thực tế trên sheet bắt đầu từ hàng 2
+        var rowIndex = i + 2; 
+        sheet.deleteRow(rowIndex);
+        break; // thoát vòng lặp sau khi xóa
+      }
+    }
+  }
+}
+
 
 function doPost(e) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2'); // đổi tên sheet cho đúng
@@ -56,11 +139,17 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ items: items }))
       .setMimeType(ContentService.MimeType.JSON);
   }
-
-  // Ghi dữ liệu vào bảng: Tên, Email, Thời gian
-  sheet.appendRow([data.name, data.email, new Date()]);
-
-  return ContentService.createTextOutput('OK')
+  if (data && data.action === 'delete') {
+    deleteData(data.name);
+    var items = getRegistrations_();
+    return ContentService.createTextOutput(JSON.stringify({ items: items }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  // Cập nhật 
+  var returnContent = updateResign(data.name, new Date(), data.mat);
+  //var returnContent = updateResign('안세린', new Date(), data.mat);
+  
+  return ContentService.createTextOutput(returnContent)
     .setMimeType(ContentService.MimeType.TEXT);
 }
 

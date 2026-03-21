@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tennis match | Liên hệ</title>
+  <title>Tennis match | Đăng kí trận</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -14,17 +14,16 @@
         <span class="app-badge">Tennis match</span>
         <h1 class="screen-title">경기 등록 / Đăng kí trận</h1>
       </div>
-      <p class="screen-subtitle">경기 등록 정보 / Thông tin đăng kí trận</p>
+      <p class="screen-subtitle">경기 등록 정보 / Thông tin đăng kí trận 21/03/2026</p>
     </header>
     <main>
       <section class="card contact-card" style="width: 100%;">
         <form id="contactForm" class="form" style="width: 100%;">
-          <div class="field" style="width: 100%;">
+          <div class="field" style="width: 100%; align-items: center; display: flex; flex-direction: row;">
             <label for="name" style="width: 100px;">
-              당신의 이름<br/>
-              Tên của bạn
+              당신의 이름
             </label>
-            <input style="width: max-content;"
+            <input
               type="text"
               id="name"
               name="name"
@@ -32,25 +31,24 @@
               required
             />
           </div>
-
-          <div class="field" style="width: 100%;">
-            <label for="email" style="width: 100px;">이메일<br/>Email</label>
-            <input style="width: max-content;"
-              type="email"
-              id="email"
-              name="email"
-              placeholder="email@vidu.com"
-              required
-            />
+          <div style="display: flex; align-items: center; margin-top: 8px; flex-direction: column;">
+            <div class="field" style="width: max-content; display:inline-block; align-items: center;">
+              <label style="align-self: center; width: max-content;">단식 경기</label>
+              <label for="mat" class="switch" style="margin: 0 18px;">
+                  <input type="checkbox" id="mat" name="mat">
+                  <span class="slider" ></span>
+              </label>
+              <label style="align-self: center; width: max-content;">복식 경기</label>
+            </div>
           </div>
           <button type="submit" class="primary-button">
-            경기 등록 / Đăng kí trận
+            경기 등록
           </button>
-          <p class="form-hint">Thông tin của bạn được giữ bảo mật tuyệt đối.</p>
+          <p class="form-hint">함께 신청하여 즐거운 경기!</p>
         </form>
       </section>
         <section class="card list-card" style="width: 100%; margin-top: 16px;">
-          <h2 class="list-title">등록 명단 / Danh sách đã đăng kí</h2>
+          <h2 id="headerGroub" class="list-title">등록 명단 / Danh sách đã đăng kí</h2>
           <div id="registrationList" class="registration-list"></div>
         </section>
     </main>
@@ -77,14 +75,15 @@
       list.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'registration-item';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'right';
+        row.style.alignItems = 'center';
+
 
         const nameEl = document.createElement('div');
         nameEl.className = 'registration-name';
-        nameEl.textContent = item.name || 'Ẩn danh';
-
-        const emailEl = document.createElement('div');
-        emailEl.className = 'registration-email';
-        emailEl.textContent = item.email || '';
+        nameEl.textContent = item.name;
+        nameEl.style.flex = '1';
 
         const timeEl = document.createElement('div');
         timeEl.className = 'registration-time';
@@ -92,18 +91,62 @@
           const dt = new Date(item.createdAt);
           if (!Number.isNaN(dt.valueOf())) {
             timeEl.textContent = dt.toLocaleString('vi-VN');
+            timeEl.align = 'right';
           }
-        }
+        } 
+        const matE1 = document.createElement('div');
+        matE1.className = 'registration-mat';
+        matE1.textContent = item.mat || '-';
+        matE1.align = 'right';
+        matE1.style.marginLeft = '16px';
+
+        const sanE1 = document.createElement('div');
+        sanE1.className = 'registration-san';
+        sanE1.textContent = item.san || '-';
+        sanE1.align = 'right';
+        sanE1.style.marginLeft = '16px';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'primary-button';
+        cancelBtn.textContent = '취소';
+        cancelBtn.style.height = '30px';
+        cancelBtn.style.width = '60px';
+        cancelBtn.style.padding = '0 5px';
+
+        cancelBtn.addEventListener('click', () => {
+          if (confirm(`정말로 ${item.name}의 등록을 취소하시겠습니까?`)) {
+            fetch(proxyURL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'delete', name: item.name }),
+            })
+              .then((response) => response.text())
+              .then((result) => {
+                alert(result);
+                loadRegistrations();
+              })
+              .catch((error) => {
+                console.error('Error!', error);
+                alert('등록 취소 실패, 다시 시도해주세요.');
+              });
+          }
+        });
 
         row.appendChild(nameEl);
-        row.appendChild(emailEl);
         row.appendChild(timeEl);
+        row.appendChild(matE1);
+        row.appendChild(sanE1);
+        row.appendChild(cancelBtn);
         container.appendChild(row);
       });
     }
 
     async function loadRegistrations() {
+      const headerGroup = document.getElementById('headerGroub');
       try {
+        if (headerGroup) {
+          headerGroup.textContent = ' Loading... / Đang tải...';
+        }
         const response = await fetch(proxyURL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -119,6 +162,9 @@
       } catch (error) {
         console.error('Không tải được danh sách đăng kí:', error);
         renderRegistrations([]);
+      } 
+      finally {
+        headerGroup.textContent = '등록 명단 / Danh sách đã đăng kí';
       }
     }
 
@@ -131,7 +177,7 @@
 
       const payload = {
         name: form.name.value,
-        email: form.email.value,
+        mat: form.mat.checked ? '복식 경기' :'단식 경기'
       };
 
       fetch(proxyURL, {
@@ -141,7 +187,7 @@
       })
         .then((response) => response.text())
         .then((result) => {
-          alert(' 성공 / Thành công ' + result);
+          alert(result);
           form.reset();
           return loadRegistrations();
         })
