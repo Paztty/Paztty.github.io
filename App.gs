@@ -15,8 +15,12 @@ function getRegistrations_() {
   var items = [];
 
   for (var i = 0; i < values.length; i++) {
-    var row = values[i];
 
+    var row = values[i];
+    if (row[1] instanceof Date) {
+      if(row[1].getDate() != new Date().getDate());
+      sheet.deleteRow(i);
+    }
     // Bỏ qua các dòng trống tên
     if (!row[0]) {
       continue;
@@ -24,6 +28,7 @@ function getRegistrations_() {
 
     var createdAt = '';
     if (row[1] instanceof Date) {
+
       createdAt = row[1].toISOString();
     } else if (row[1]) {
       createdAt = String(row[1]);
@@ -32,15 +37,14 @@ function getRegistrations_() {
     items.push({
       name: row[0] || '',
       createdAt: createdAt,
-      mat: row[2],
-      san: row[3]
+      san: row[2]
     });
   }
 
   return items;
 }
 
-function updateResign(name, date, mat)
+function updateResign(name, date)
 {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet2');
   var sheet1 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Sheet1');
@@ -96,7 +100,7 @@ function updateResign(name, date, mat)
     }
   }
   // Ghi dữ liệu vào bảng: Tên, Thời gian, sân đấu
-  sheet.appendRow([name, date,mat, san]);
+  sheet.appendRow([name, date, san]);
 }
 
 function deleteData(name)
@@ -146,7 +150,7 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
   // Cập nhật 
-  var returnContent = updateResign(data.name, new Date(), data.mat);
+  var returnContent = updateResign(data.name, new Date());
   //var returnContent = updateResign('안세린', new Date(), data.mat);
   
   return ContentService.createTextOutput(returnContent)

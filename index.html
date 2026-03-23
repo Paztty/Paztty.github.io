@@ -12,9 +12,9 @@
     <header class="app-header">
       <div class="app-title-group">
         <span class="app-badge">Tennis match</span>
-        <h1 class="screen-title">경기 등록 / Đăng kí trận</h1>
+        <h1 class="screen-title">경기 등록</h1>
       </div>
-      <p class="screen-subtitle">경기 등록 정보 / Thông tin đăng kí trận 21/03/2026</p>
+      <p id="DailySubtitle" class="screen-subtitle" style="width: max-content; text-align: right;">경기 등록 정보 </p>
     </header>
     <main>
       <section class="card contact-card" style="width: 100%;">
@@ -27,19 +27,9 @@
               type="text"
               id="name"
               name="name"
-              placeholder="Nhập tên của bạn"
+              placeholder="입력하세요!"
               required
             />
-          </div>
-          <div style="display: flex; align-items: center; margin-top: 8px; flex-direction: column;">
-            <div class="field" style="width: max-content; display:inline-block; align-items: center;">
-              <label style="align-self: center; width: max-content;">단식 경기</label>
-              <label for="mat" class="switch" style="margin: 0 18px;">
-                  <input type="checkbox" id="mat" name="mat">
-                  <span class="slider" ></span>
-              </label>
-              <label style="align-self: center; width: max-content;">복식 경기</label>
-            </div>
           </div>
           <button type="submit" class="primary-button">
             경기 등록
@@ -48,7 +38,7 @@
         </form>
       </section>
         <section class="card list-card" style="width: 100%; margin-top: 16px;">
-          <h2 id="headerGroub" class="list-title">등록 명단 / Danh sách đã đăng kí</h2>
+          <h2 id="headerGroub" class="list-title">등록 명단</h2>
           <div id="registrationList" class="registration-list"></div>
         </section>
     </main>
@@ -59,6 +49,14 @@
     const form = document.getElementById('contactForm');
 
     function renderRegistrations(list) {
+      const subTitle = document.getElementById('DailySubtitle');
+      if (subTitle) {
+        const today = new Date();
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        subTitle.textContent = `경기 등록 정보 ${today.toLocaleDateString('vi-VN', options)}`;
+      }
+
+
       const container = document.getElementById('registrationList');
       if (!container) return;
 
@@ -67,7 +65,7 @@
       if (!list || !list.length) {
         const p = document.createElement('p');
         p.className = 'empty-text';
-        p.textContent = 'Chưa có đăng kí nào.';
+        p.textContent = '없습니다.';
         container.appendChild(p);
         return;
       }
@@ -94,12 +92,6 @@
             timeEl.align = 'right';
           }
         } 
-        const matE1 = document.createElement('div');
-        matE1.className = 'registration-mat';
-        matE1.textContent = item.mat || '-';
-        matE1.align = 'right';
-        matE1.style.marginLeft = '16px';
-
         const sanE1 = document.createElement('div');
         sanE1.className = 'registration-san';
         sanE1.textContent = item.san || '-';
@@ -122,7 +114,7 @@
             })
               .then((response) => response.text())
               .then((result) => {
-                alert(result);
+                alert(' 등록이 취소되었습니다: ' + item.name);
                 loadRegistrations();
               })
               .catch((error) => {
@@ -134,7 +126,6 @@
 
         row.appendChild(nameEl);
         row.appendChild(timeEl);
-        row.appendChild(matE1);
         row.appendChild(sanE1);
         row.appendChild(cancelBtn);
         container.appendChild(row);
@@ -145,7 +136,7 @@
       const headerGroup = document.getElementById('headerGroub');
       try {
         if (headerGroup) {
-          headerGroup.textContent = ' Loading... / Đang tải...';
+          headerGroup.textContent = '등록 명단을 불러오는 중...';
         }
         const response = await fetch(proxyURL, {
           method: 'POST',
@@ -156,15 +147,15 @@
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log('Danh sách đăng kí đã tải:', data);
+        console.log('등록 명단이 불러와졌습니다:', data);
         const list = Array.isArray(data.items) ? data.items : data;
         renderRegistrations(list);
       } catch (error) {
-        console.error('Không tải được danh sách đăng kí:', error);
+        console.error('등록 명단을 불러오지 못했습니다:', error);
         renderRegistrations([]);
       } 
       finally {
-        headerGroup.textContent = '등록 명단 / Danh sách đã đăng kí';
+        headerGroup.textContent = '등록 명단';
       }
     }
 
@@ -173,11 +164,10 @@
 
       const submitButton = form.querySelector('button[type="submit"]');
       submitButton.disabled = true;
-      submitButton.textContent = 'Đang gửi...';
+      submitButton.textContent = '전송 중...';
 
       const payload = {
-        name: form.name.value,
-        mat: form.mat.checked ? '복식 경기' :'단식 경기'
+        name: form.name.value
       };
 
       fetch(proxyURL, {
@@ -187,17 +177,18 @@
       })
         .then((response) => response.text())
         .then((result) => {
-          alert(result);
           form.reset();
+          submitButton.disabled = false;
+          submitButton.textContent = '경기 등록';
           return loadRegistrations();
         })
         .catch((error) => {
           console.error('Error!', error);
-          alert('실패 / Đã xảy ra lỗi, vui lòng thử lại.');
+          alert('실패 : 오류가 발생했습니다. 다시 시도해주세요.');
         })
         .finally(() => {
           submitButton.disabled = false;
-          submitButton.textContent = '경기 등록 / Đăng kí trận';
+          submitButton.textContent = '경기 등록';
         });
     });
 
