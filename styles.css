@@ -7,15 +7,61 @@
     --text-primary: #111827;
     --text-secondary: #6b7280;
     --border-subtle: rgba(0, 0, 0, 0.06);
-    --radius-large: 22px;
-    --radius-medium: 14px;
-    --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
-    --transition-fast: 160ms ease-out;
-}
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        grid-gap: 16px;
+        margin-top: 20px;
+    }
 
-* {
-    margin: 0;
-    padding: 0;
+    .court {
+        position: relative;
+        width: 100%;
+        /* Tỉ lệ gần giống sân tennis (dài hơn rộng) */
+        padding-top: 60%;
+        border-radius: 0px;
+        overflow: hidden;
+        /* Nền sân + đường kẻ được vẽ bằng nhiều lớp background */
+        background:
+            /* Các đường ngang: baseline + service line */
+            linear-gradient(to bottom,
+                transparent 0%,
+                transparent 6%,
+                #ffffff 6%, #ffffff 7%,      /* baseline trên */
+                transparent 7%,
+                transparent 30%,
+                #ffffff 30%, #ffffff 31%,    /* service line trên */
+                transparent 31%,
+                transparent 69%,
+                #ffffff 69%, #ffffff 70%,    /* service line dưới */
+                transparent 70%,
+                transparent 93%,
+                #ffffff 93%, #ffffff 94%,    /* baseline dưới */
+                transparent 94%,
+                transparent 100%
+            ),
+            /* Các đường dọc: sideline + center service line */
+            linear-gradient(to right,
+                transparent 0%,
+                transparent 8%,
+                #ffffff 8%, #ffffff 9%,      /* sideline trái */
+                transparent 9%,
+                transparent 47.5%,
+                #ffffff 47.5%, #ffffff 52.5%,/* vùng center service line */
+                transparent 52.5%,
+                transparent 91%,
+                #ffffff 91%, #ffffff 92%,    /* sideline phải */
+                transparent 92%,
+                transparent 100%
+            ),
+            #0e7c3f;                       /* màu nền sân */
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.35);
+        border: 3px solid #f9fafb;       /* đường biên ngoài */
+        color: #f9fafb;
+        font-weight: 600;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 8px 10px;
     box-sizing: border-box;
 }
 
@@ -54,6 +100,24 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    /* Vẽ lưới ở giữa sân */
+    .court::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 3px;
+        background: repeating-linear-gradient(
+            90deg,
+            #f9fafb 0,
+            #f9fafb 6px,
+            #0e7c3f 6px,
+            #0e7c3f 10px
+        );
+        transform: translateY(-50%);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+    }
     margin-bottom: 4px;
 }
 
@@ -526,4 +590,186 @@ input:checked + .slider {
 }
 input:checked + .slider:before {
   transform: translateX(30px);
+}
+
+#courtsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 20px;
+    margin-top: 20px;
+}
+
+.court {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-top: 50%; /* xoay 90 độ: sân dọc cao gấp đôi rộng */
+    background: #2e7d32;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    border: 3px solid #ffffff;
+    overflow: visible;
+}
+
+/* Texture effect - sọc ngang cho sân dọc */
+.court .texture {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.02) 0px,
+        rgba(255,255,255,0.02) 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    pointer-events: none;
+}
+
+/* Doubles sidelines - giờ là đường ngang (trên/dưới) */
+.court::before {
+    content: "";
+    position: absolute;
+    top: 2.2%;
+    bottom: 2.2%;
+    left: 0;
+    width: 100%;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+/* Singles sidelines - giờ là đường ngang */
+.court .singles {
+    position: absolute;
+    top: 8.8%;
+    bottom: 8.8%;
+    left: 0;
+    right: 0;
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+/* Baselines - giờ là đường dọc (trái/phải) */
+.court .baseline-top,
+.court .baseline-bottom {
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    background: white;
+    top: 0;
+}
+
+.court .baseline-top { left: 0; }
+.court .baseline-bottom { right: 0; }
+
+/* Service lines - giờ là đường dọc */
+.court .service-top,
+.court .service-bottom {
+    position: absolute;
+    top: 8.8%;
+    bottom: 8.8%;
+    width: 2px;
+    background: white;
+}
+
+.court .service-top { left: 26.6%; }
+.court .service-bottom { right: 26.6%; }
+
+/* Center service line - giờ là đường ngang */
+.court .center-service {
+    position: absolute;
+    left: 26.6%;
+    right: 26.6%;
+    top: 50%;
+    height: 2px;
+    background: white;
+    transform: translateY(-50%);
+}
+
+/* Center marks - giờ là ngang */
+.court .center-mark-top,
+.court .center-mark-bottom {
+    position: absolute;
+    height: 2px;
+    width: 4%;
+    background: white;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.court .center-mark-top { left: 0; }
+.court .center-mark-bottom { right: 0; }
+
+/* Net - giờ là đường dọc ở giữa */
+.court .net {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: white;
+    transform: translateX(-50%);
+    box-shadow: 2px 0 4px rgba(0,0,0,0.3);
+}
+
+/* Net mesh effect - giờ theo chiều dọc */
+.court .net::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 0;
+    height: 100%;
+    width: 10px;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.3) 0px,
+        rgba(255,255,255,0.3) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+}
+
+/* Court label positioning */
+.court .court-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+    z-index: 10;
+    background: rgba(0,0,0,0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transform: translate(-50%, -50%);
+}
+/* Player name labels */
+.court .player-1,
+.court .player-2 {
+    position: absolute;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    z-index: 10;
+    background: rgba(0,0,0,0.5);
+    padding: 6px 10px;
+    border-radius: 6px;
+    top: 50%;
+}
+
+.court .player-1 {
+    left: 10px;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    transform: translateY(-130%);
+}
+
+.court .player-2 {
+    right: 10px;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    transform: translateY(50%);
 }

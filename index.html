@@ -40,13 +40,18 @@
         <section class="card list-card" style="width: 100%; margin-top: 16px;">
           <h2 id="headerGroub" class="list-title">등록 명단</h2>
           <div id="registrationList" class="registration-list"></div>
-        </section>
+          <button id="showCourtsBtn" class="primary-button" style="margin-top: 16px;"> 오늘 경기 매칭</button>
+          <div id="courtsContainer" class="courts-container" style="display: none; margin-top: 16px;">
+            
+          </div>
+      </section>
     </main>
   </div>
 
   <script>
     const proxyURL = "https://rough-leaf-4510.hovantan1107.workers.dev/";
     const form = document.getElementById('contactForm');
+    var currentRegistrations = [];
 
     function renderRegistrations(list) {
       const subTitle = document.getElementById('DailySubtitle');
@@ -69,6 +74,8 @@
         container.appendChild(p);
         return;
       }
+      
+      currentRegistrations = list;
 
       list.forEach((item) => {
         const row = document.createElement('div');
@@ -149,10 +156,13 @@
         const data = await response.json();
         console.log('등록 명단이 불러와졌습니다:', data);
         const list = Array.isArray(data.items) ? data.items : data;
+        currentRegistrations = list;
         renderRegistrations(list);
+        renderCourts();
       } catch (error) {
         console.error('등록 명단을 불러오지 못했습니다:', error);
         renderRegistrations([]);
+        renderCourts();
       } 
       finally {
         headerGroup.textContent = '등록 명단';
@@ -191,7 +201,67 @@
           submitButton.textContent = '경기 등록';
         });
     });
+    
+    document.getElementById("showCourtsBtn").addEventListener("click", function() {
+      const courtsContainer = document.getElementById('courtsContainer');
+      if (courtsContainer.style.display === 'none') {
+        courtsContainer.style.display = 'block';
+        this.textContent = '경기 매칭 숨기기';
+      } else {
+        courtsContainer.style.display = 'none';
+        this.textContent = '오늘 경기 매칭';
+      }
+      renderCourts();
+    });
 
+    function renderCourts() {
+      const courtsContainer = document.getElementById("courtsContainer");
+      courtsContainer.style.display = "grid";
+      courtsContainer.innerHTML = "";
+      
+      // Tạo 4 sân tennis viết tên người chơi vào mỗi sân theo danh sách đăng kí với 
+      // sân đấu được gắn trong item.san
+      const registrations = currentRegistrations || [];
+      
+      // Debug: in ra dữ liệu để kiểm tra
+      console.log('Registrations:', registrations);
+      console.log('Number of players:', registrations.length);
+      
+      for (let i = 1; i <= 4; i++) {
+        const courtDiv = document.createElement("div");
+        courtDiv.className = "court";
+        
+        // Lấy danh sách người chơi cho sân này (so sánh linh hoạt)
+        const players = registrations.filter(r => {
+          const courtNum = r.san ? String(r.san).trim() : '';
+          return courtNum === String(i);
+        });
+        
+        console.log(`Court ${i} players:`, players);
+        
+        const player1 = players[0]?.name || '...';
+        const player2 = players[1]?.name || '...';
+        
+        // Tạo các phần tử con cho sân tennis
+        courtDiv.innerHTML = `
+          <div class="texture"></div>
+          <div class="singles"></div>
+          <div class="baseline-top"></div>
+          <div class="baseline-bottom"></div>
+          <div class="service-top"></div>
+          <div class="service-bottom"></div>
+          <div class="center-service"></div>
+          <div class="center-mark-top"></div>
+          <div class="center-mark-bottom"></div>
+          <div class="net"></div>
+          <div class="court-label">경기장 ${i}</div>
+          <div class="player-1">${player1}</div>
+          <div class="player-2">${player2}</div>
+        `;
+        
+        courtsContainer.appendChild(courtDiv);
+      }
+    }
     // Tải danh sách đăng kí từ Google Sheet khi mở trang
     loadRegistrations();
   </script>
