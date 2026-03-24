@@ -747,7 +747,9 @@ input:checked + .slider:before {
 }
 /* Player name labels */
 .court .player-1,
-.court .player-2 {
+.court .player-2,
+.court .player-3,
+.court .player-4 {
     position: absolute;
     color: white;
     font-weight: 600;
@@ -768,8 +770,20 @@ input:checked + .slider:before {
 }
 
 .court .player-2 {
+    left: 10px;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    transform: translateY(30%);
+}
+.court .player-3 {
     right: 10px;
     writing-mode: horizontal-tb;
     text-orientation: mixed;
-    transform: translateY(50%);
+    transform: translateY(-130%);
+}
+.court .player-4 {
+    right: 10px;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    transform: translateY(40%);
 }

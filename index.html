@@ -240,6 +240,8 @@
         
         const player1 = players[0]?.name || '...';
         const player2 = players[1]?.name || '...';
+        const player3 = players[2]?.name || '...';
+        const player4 = players[3]?.name || '...';
         
         // Tạo các phần tử con cho sân tennis
         courtDiv.innerHTML = `
@@ -256,7 +258,8 @@
           <div class="court-label">경기장 ${i}</div>
           <div class="player-1">${player1}</div>
           <div class="player-2">${player2}</div>
-        `;
+          <div class="player-3">${player3}</div>
+          <div class="player-4">${player4}</div>`;
         
         courtsContainer.appendChild(courtDiv);
       }
