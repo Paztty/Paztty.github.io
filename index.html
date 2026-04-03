@@ -189,6 +189,7 @@
           form.reset();
           submitButton.disabled = false;
           submitButton.textContent = '경기 등록';
+          alert(result + ': ' + payload.name);
           return loadRegistrations();
         })
         .catch((error) => {
